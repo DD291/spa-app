@@ -229,7 +229,7 @@ const tableAdd = async (formJson:any) => {
 }
 
     return (
-      <Box> 
+      <Container className="p-4 border-4" > 
     <Box className="Table">
       <React.Fragment>
       <Dialog
@@ -259,10 +259,12 @@ const tableAdd = async (formJson:any) => {
       Проблема с подключением, попробуйте еще раз </p>}
 
 {loading===true ? 
-( <Skeleton variant="rectangular" width="90vw" height="80vh" />) :
-    (    <Paper>
+( <Skeleton 
+  variant="rectangular" 
+  className="text-gray-500"
+   />) :
+    (    <Paper className="mb-20">
       <TableContainer
-       sx={{ height: "80vh", width: "90vw" }}
        >
         <Table
         className="w-full min-w-max table-auto text-left"
@@ -548,7 +550,7 @@ const tableAdd = async (formJson:any) => {
       </Dialog>
     </React.Fragment>
     </Box>
-    </Box>
+    </Container>
     )
 
 }
