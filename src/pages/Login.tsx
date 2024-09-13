@@ -12,6 +12,8 @@ const Login = () => {
     const [error, setError] = useState(false);
     const [loading, setLoading] = useState(false);
     const [apiResp, setApiResp] = useState("null");
+    const [apierror, setApierror] = useState(false);
+
 
 
     const [user, setUser] = useState({
@@ -25,11 +27,13 @@ const Login = () => {
         const { name, value } = event.target;
         console.log(name, value)
         setUser({ ...user, [name]: value });
+        setApierror(false)
         setError(false);
     }
 
     const handelSubmit = async (event:any) => {
         event.preventDefault();
+        setApierror(false)
 
         if (!user.name.includes("user") || user.pw != "password"){
             setError(true);
@@ -48,8 +52,8 @@ const Login = () => {
                 },
                 body: JSON.stringify(
                   {
-                  "username": "user134",
-                  "password": "password"
+                  "username": user.name,
+                  "password": user.pw
                   }
                 ),
             });
@@ -74,9 +78,9 @@ const Login = () => {
                           "token" : apiResp
                 }});
             } 
-
-
-          
+            else{
+                setApierror(true);
+            }
 
         } catch (error:any) {
             setLoading(false);
@@ -127,6 +131,9 @@ const Login = () => {
                 // style={{background: 'cyan'}}
                 className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" 
                 >ОК</Button>
+                {apierror && <p className="text-red-500 text-xs italic">
+                    Проблема с подключением, попробуйте еще раз </p>}
+
                 </div>
             </form>
         </div>

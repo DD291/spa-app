@@ -1,5 +1,5 @@
 
-import { Button, Container,Box, CircularProgress, DialogContentText, Skeleton } from "@mui/material";
+import { Button, Container,Box, CircularProgress, DialogContentText, Skeleton, LinearProgress } from "@mui/material";
 import React, { useEffect, useState } from 'react';
 // import { useLocation, useNavigate } from "react-router-dom";
 import TextField from '@mui/material/TextField';
@@ -49,15 +49,14 @@ import { useSelector } from 'react-redux';
   const [error, setError] = useState(null);
   const [tableData, setTableData] = useState<any[]>([]);
   const newDate = new Date().toISOString();
-
-  const handlePopOpen = () => {
-    setAddOpen(true);
-  };
+  const [apierror, setApierror] = useState(false);
 
 
 
 useEffect(() => {
     tableDownload();
+    setApierror(false);
+
   }, []);
 const handleDelClose = () => {
   setDeleteOpen(false);
@@ -95,6 +94,7 @@ const openPopChoice = (postId:string) => {
 
 
 const handleEdit = async (postId:string, jsonBody:any) => {
+  setEditOpen(false);
   setLoading(true);
   await tableEdit(postId,jsonBody);
   await delay(1000);
@@ -116,11 +116,12 @@ const handleEdit = async (postId:string, jsonBody:any) => {
 
  } catch (error:any) {
      setError(error.message);
+     setApierror(true);
  } 
-    setEditOpen(false);
 }
 
 const handleDel = async (postId:string) => {
+  setDeleteOpen(false);
   setLoading(true);
   await tableDelete(postId);
   await delay(1000);
@@ -142,9 +143,8 @@ const tableDelete = async (postId:string) => {
 
   } catch (error:any) {
       console.log(error.message);
+      setApierror(true);
   } 
-
-  setDeleteOpen(false)
 }
 
 
@@ -168,8 +168,6 @@ function renderInfo(item:any) {
   );
 }
 
-
-// ////////////////////////////////////
 
 const [input, setInput] = useState({
   companySignatureName: "",
@@ -198,6 +196,7 @@ const handleClose = () => {
 
 
 const handleAdd = async (formJson:any) => {
+  handleClose();
   setLoading(true);
   await tableAdd(formJson);
   await delay(1000);
@@ -205,13 +204,8 @@ const handleAdd = async (formJson:any) => {
   setLoading(false);
 }
 
-const tableAdd = async (
-  // event:any,
-   formJson:any) => {
-  // event.preventDefault();
-  setLoading(true);
+const tableAdd = async (formJson:any) => {
   const url = HOST+CREATE_L;
-  console.log("formJson " + JSON.stringify(formJson))
   axiosInstance.defaults.headers.common["x-auth"] = token; 
   try {
        const res = addRequest(
@@ -221,6 +215,7 @@ const tableAdd = async (
 
   } catch (error:any) {
       console.log(error.message);
+      setApierror(true);
   } 
   setInput({
     companySignatureName: "",
@@ -231,16 +226,10 @@ const tableAdd = async (
     employeeSignatureName: "",
 });
 
-await delay(1000);
-await tableDownload(); 
-setLoading(false);
-
-  handleClose();
 }
 
     return (
       <Box> 
-      {loading &&  <CircularProgress size={20}/> }
     <Box className="Table">
       <React.Fragment>
       <Dialog
@@ -262,7 +251,12 @@ setLoading(false);
         </DialogActions>
       </Dialog>
     </React.Fragment>
+
     <Button onClick={tableDownload} > Обновить данные </Button>
+    {loading &&  <LinearProgress color="secondary" /> }
+
+    {apierror && <p className="text-red-500 text-xs italic">
+      Проблема с подключением, попробуйте еще раз </p>}
 
 {loading===true ? 
 ( <Skeleton variant="rectangular" width="90vw" height="80vh" />) :
@@ -289,8 +283,8 @@ setLoading(false);
               <TableCell className="font-normal leading-none opacity-70 w-8">Document Name</TableCell>
               <TableCell className="font-normal leading-none opacity-70 w-8">Company Signature Name</TableCell>
               <TableCell className="font-normal leading-none opacity-70 w-8">Employee Signature Name</TableCell>
-              <TableCell className="font-normal leading-none opacity-70 w-8">Employee Sig Date</TableCell>
-              <TableCell className="font-normal leading-none opacity-70 w-8">Company Sig Date</TableCell>
+              <TableCell className="font-normal leading-none opacity-70 w-8">Employee Signature Date</TableCell>
+              <TableCell className="font-normal leading-none opacity-70 w-8">Company Signature Date</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -425,8 +419,6 @@ setLoading(false);
     </React.Fragment>
 
 
-    {/* //////////////////// */}
-
     <React.Fragment>
       <Button variant="outlined" onClick={handleClickOpen}>
         Добавить запись
@@ -442,7 +434,6 @@ setLoading(false);
             const formJson = Object.fromEntries((formData as any).entries());
             // tableAdd(event, formJson);
             handleAdd(formJson);
-
           },
         }}
       >
