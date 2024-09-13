@@ -1,16 +1,12 @@
 import axios, {AxiosInstance} from "axios";
-const APIURL = "";
-const TESTKEY = "supersecrettoken_for_user1";
+import { HOST } from "./vars";
 
 
 export const axiosInstance = axios.create(
         {
-            baseURL: APIURL,
+            baseURL: HOST,
             headers: {
                 "Content-Type": "application/json",
-                Authorization : TESTKEY,
-                "x-auth" : TESTKEY,
-                // token: ""
             }
         }
 )
